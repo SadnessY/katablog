@@ -56,23 +56,48 @@ const FormOfArticle = () => {
       tagList: arrayOfTags,
       title: data.title,
     };
-
-    if (id) {
-      const params = {
-        slug: id,
-        apiToken: user.user.token,
-        dataForUpdatingAnArticle: dataForCreatingOrUpdatingAnArticle,
-      };
-      dispatch(updateArticle(params));
-    } else {
-      const params = {
-        apiToken: user.user.token,
-        dataForCreatingAnArticle: dataForCreatingOrUpdatingAnArticle,
-      };
-      dispatch(creacteArticle(params));
+    const validation = (article) => {
+      for (let key of Object.keys(article)) {
+        if (arrayOfTags.length !== 0) {
+          for (let item of article[key]) {
+            if (item.trim() !== '') {
+              continue
+            } else {
+              return false
+            }
+          }
+        }
+        if (typeof article[key] === 'string') {
+          if (article[key].trim() !== '') {
+            continue
+          } else {
+            return false
+          }
+        }
+      }
+      return true
     }
-
-    history.push('/');
+    if (validation(dataForCreatingOrUpdatingAnArticle)) {
+      if (id) {
+        const params = {
+          slug: id,
+          apiToken: user.user.token,
+          dataForUpdatingAnArticle: dataForCreatingOrUpdatingAnArticle,
+        };
+        dispatch(updateArticle(params));
+        history.push('/');
+      } else {
+        const params = {
+          apiToken: user.user.token,
+          dataForCreatingAnArticle: dataForCreatingOrUpdatingAnArticle,
+        };
+        dispatch(creacteArticle(params));
+        history.push('/');
+      }
+    } else {
+      alert('Поля не могут быть пустыми или содержать только пробелы')
+      return
+    }
   };
 
   if (articles.status === 'rejected') {
